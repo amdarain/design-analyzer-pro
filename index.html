@@ -1,0 +1,342 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Analyzer Pro - Ahmed Ali</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="description" content="Image Color Analyzer for Graphic Designers">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Design Analyzer">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <style>
+        :root{--p:#7c3aed;--pl:#a78bfa;--ac:#f59e0b;--bg:#09090f;--sf:rgba(255,255,255,.04);--sf2:rgba(255,255,255,.08);--bd:rgba(255,255,255,.08);--tx:#f1f5f9;--tm:#94a3b8;--td:#64748b;--ok:#22c55e;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html{scroll-behavior:smooth;}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;}
+        body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 60% at 15% 15%,rgba(124,58,237,.18) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 85% 85%,rgba(99,102,241,.18) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+        /* WELCOME */
+        #welcome{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#09090f 0%,#1a0a2e 50%,#0a0f1a 100%);padding:20px;text-align:center;transition:opacity .6s,visibility .6s;}
+        #welcome.hide{opacity:0;visibility:hidden;pointer-events:none;}
+        .wlc-icon{font-size:88px;margin-bottom:18px;animation:fl 3s ease-in-out infinite;filter:drop-shadow(0 0 28px rgba(124,58,237,.5));}
+        @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+        .wlc-title{font-size:clamp(1.8rem,6vw,3rem);font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#a78bfa,#f59e0b,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
+        .wlc-sub{font-size:1rem;color:var(--tm);margin-bottom:22px;}
+        .wlc-badge{display:inline-flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(124,58,237,.1));border:1px solid rgba(245,158,11,.25);border-radius:50px;padding:11px 26px;margin-bottom:28px;}
+        .wlc-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;color:#fff;}
+        .wlc-nm{font-size:1.1rem;font-weight:700;color:var(--ac);text-align:left;}
+        .wlc-nm span{display:block;font-size:.7rem;color:var(--tm);font-weight:400;}
+        .wlc-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px;max-width:460px;}
+        .wlc-tag{background:var(--sf2);border:1px solid var(--bd);border-radius:20px;padding:5px 13px;font-size:.8rem;color:var(--tm);}
+        .btn-start{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff;border:none;padding:15px 46px;border-radius:50px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .3s;box-shadow:0 14px 38px rgba(124,58,237,.4);}
+        .btn-start:hover{transform:translateY(-3px);box-shadow:0 20px 48px rgba(124,58,237,.6);}
+
+        /* APP */
+        #app{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:20px 20px 60px;}
+        header{display:flex;align-items:center;justify-content:space-between;padding:18px 0 26px;}
+        .logo{display:flex;align-items:center;gap:11px;}
+        .logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 14px rgba(124,58,237,.38);}
+        .logo-nm{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .logo-by{font-size:.65rem;color:var(--td);}
+        #install-btn{display:none;align-items:center;gap:7px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.32);color:var(--pl);padding:8px 18px;border-radius:24px;cursor:pointer;font-size:.86rem;font-weight:600;transition:all .2s;}
+        #install-btn.show{display:flex;}
+        #install-btn:hover{background:rgba(124,58,237,.22);}
+
+        /* UPLOAD */
+        .upload-zone{border:2px dashed rgba(124,58,237,.38);border-radius:20px;padding:52px 28px;text-align:center;cursor:pointer;transition:all .28s;background:var(--sf);backdrop-filter:blur(10px);margin-bottom:26px;}
+        .upload-zone:hover,.upload-zone.over{border-color:var(--p);background:rgba(124,58,237,.07);}
+        .up-icon{font-size:52px;margin-bottom:13px;}
+        .up-txt{font-size:1rem;color:var(--tm);}
+        .up-txt strong{color:var(--tx);}
+        .up-hl{color:var(--pl);font-weight:600;}
+        .up-note{font-size:.78rem;color:var(--td);margin-top:7px;}
+
+        /* LOADER */
+        #loader{display:none;text-align:center;padding:48px 20px;}
+        #loader.on{display:block;}
+        .ring{width:52px;height:52px;border:4px solid rgba(124,58,237,.14);border-top-color:var(--p);border-radius:50%;animation:spin .85s linear infinite;margin:0 auto 13px;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* RESULTS */
+        #results{display:none;margin-bottom:26px;}
+        #results.on{display:block;}
+        .rg{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+        @media(max-width:700px){.rg{grid-template-columns:1fr}}
+
+        /* CARD */
+        .card{background:var(--sf);backdrop-filter:blur(14px);border:1px solid var(--bd);border-radius:18px;padding:20px;transition:border-color .2s;}
+        .card:hover{border-color:rgba(124,58,237,.2);}
+        .ch{font-size:.75rem;font-weight:700;color:var(--tm);margin-bottom:14px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.5px;}
+        #prev-img{width:100%;border-radius:13px;object-fit:contain;max-height:270px;background:rgba(0,0,0,.3);}
+        .img-tags{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap;}
+        .itag{background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:3px 9px;font-size:.72rem;color:var(--tm);}
+
+        /* COLOR LIST */
+        .clist{display:flex;flex-direction:column;gap:8px;}
+        .ci{display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(255,255,255,.02);border:1px solid var(--bd);border-radius:12px;transition:all .2s;}
+        .ci:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);}
+        .sw{width:38px;height:38px;border-radius:9px;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,.38);border:2px solid rgba(255,255,255,.1);}
+        .ci-info{flex:1;min-width:0;}
+        .ci-nm{font-size:.86rem;font-weight:600;margin-bottom:3px;}
+        .ci-codes{display:flex;gap:5px;flex-wrap:wrap;}
+        .cb{font-family:'Cascadia Code',Consolas,monospace;font-size:.69rem;color:var(--tm);background:rgba(255,255,255,.05);border:1px solid var(--bd);padding:2px 7px;border-radius:5px;cursor:pointer;transition:all .16s;white-space:nowrap;}
+        .cb:hover{background:rgba(124,58,237,.2);color:var(--pl);border-color:rgba(124,58,237,.38);}
+        .cb.ok{background:rgba(34,197,94,.16);color:var(--ok);border-color:rgba(34,197,94,.32);}
+        .pb{height:3px;background:rgba(255,255,255,.07);border-radius:2px;margin-top:5px;overflow:hidden;}
+        .pf{height:100%;border-radius:2px;transition:width .9s cubic-bezier(.4,0,.2,1);}
+        .pl{font-size:.68rem;color:var(--td);white-space:nowrap;flex-shrink:0;}
+        .copy-all{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:12px;padding:8px;background:rgba(124,58,237,.07);border:1px dashed rgba(124,58,237,.28);border-radius:10px;color:var(--pl);cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s;}
+        .copy-all:hover{background:rgba(124,58,237,.16);border-style:solid;}
+
+        /* FONT */
+        .fw{grid-column:1/-1;}
+        .fi{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start;}
+        @media(max-width:580px){.fi{grid-template-columns:1fr}}
+        .fi-txt{color:var(--tm);font-size:.86rem;line-height:1.7;margin-bottom:12px;}
+        .fi-note{display:flex;align-items:flex-start;gap:9px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 12px;font-size:.8rem;color:#fbbf24;line-height:1.5;}
+        .fbts{display:flex;flex-direction:column;gap:8px;min-width:190px;}
+        .fbt{display:flex;align-items:center;gap:9px;padding:11px 15px;border-radius:12px;text-decoration:none;font-size:.84rem;font-weight:600;transition:all .2s;cursor:pointer;border:none;}
+        .fbt.p{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff;box-shadow:0 5px 16px rgba(124,58,237,.28);}
+        .fbt.p:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(124,58,237,.46);}
+        .fbt.s{background:rgba(255,255,255,.04);border:1px solid var(--bd);color:var(--tm);}
+        .fbt.s:hover{background:rgba(255,255,255,.09);color:var(--tx);}
+        .fbt-t{display:flex;flex-direction:column;}
+        .fbt-nm{font-size:.85rem;}
+        .fbt-sub{font-size:.66rem;font-weight:400;opacity:.65;}
+
+        /* CSS */
+        .css-out{background:rgba(0,0,0,.38);border:1px solid var(--bd);border-radius:11px;padding:13px 15px;font-family:'Cascadia Code',Consolas,monospace;font-size:.74rem;color:#a78bfa;white-space:pre;overflow-x:auto;margin-bottom:9px;line-height:1.65;}
+        .er{display:flex;gap:7px;flex-wrap:wrap;}
+        .bsm{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:9px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+        .bsm.pu{background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.26);color:var(--pl);}
+        .bsm.pu:hover{background:rgba(124,58,237,.24);}
+        .bsm.gn{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.26);color:var(--ok);}
+        .bsm.gn:hover{background:rgba(34,197,94,.17);}
+
+        /* HISTORY */
+        .sh{display:flex;align-items:center;justify-content:space-between;margin:32px 0 16px;}
+        .st{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+        .sc{background:rgba(124,58,237,.16);border:1px solid rgba(124,58,237,.28);color:var(--pl);padding:2px 8px;border-radius:18px;font-size:.7rem;font-weight:700;}
+        .btn-cl{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;padding:6px 14px;border-radius:18px;cursor:pointer;font-size:.76rem;font-weight:600;transition:all .2s;}
+        .btn-cl:hover{background:rgba(239,68,68,.15);}
+        .hg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+        .hc{background:var(--sf);border:1px solid var(--bd);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s;}
+        .hc:hover{transform:translateY(-4px);border-color:rgba(124,58,237,.32);box-shadow:0 7px 22px rgba(0,0,0,.28);}
+        .ht{width:100%;height:88px;object-fit:cover;display:block;}
+        .hb{padding:8px 9px;}
+        .hfn{font-size:.7rem;color:var(--tx);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+        .hdt{font-size:.62rem;color:var(--td);margin-bottom:5px;}
+        .hss{display:flex;gap:3px;}
+        .hs{width:15px;height:15px;border-radius:4px;border:1px solid rgba(255,255,255,.1);}
+        .he{text-align:center;padding:32px 18px;color:var(--td);border:1px dashed rgba(255,255,255,.07);border-radius:16px;}
+        .he-i{font-size:38px;margin-bottom:8px;}
+
+        /* TOAST */
+        #toast{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#1e1e3a,#2d1b69);border:1px solid rgba(124,58,237,.38);color:var(--tx);padding:11px 20px;border-radius:12px;font-size:.84rem;font-weight:500;box-shadow:0 9px 30px rgba(0,0,0,.38);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:9999;max-width:300px;}
+        #toast.show{transform:translateY(0);opacity:1;}
+        ::-webkit-scrollbar{width:5px;height:5px;}
+        ::-webkit-scrollbar-track{background:transparent;}
+        ::-webkit-scrollbar-thumb{background:rgba(124,58,237,.26);border-radius:3px;}
+        @media(max-width:480px){header{flex-direction:column;gap:10px;align-items:flex-start;}}
+    </style>
+</head>
+<body>
+
+<div id="welcome">
+    <div class="wlc-icon">&#127912;</div>
+    <div class="wlc-title">Design Analyzer Pro</div>
+    <div class="wlc-sub">Graphic Designers ka Ultimate Tool</div>
+    <div class="wlc-badge">
+        <div class="wlc-av">A</div>
+        <div class="wlc-nm">
+            &#128075; Khush Aamdeed, Ahmed Ali!
+            <span>Aapka personal design analyzer taiyar hai</span>
+        </div>
+    </div>
+    <div class="wlc-tags">
+        <span class="wlc-tag">&#127912; Color Extraction</span>
+        <span class="wlc-tag">&#127991; Real Color Names</span>
+        <span class="wlc-tag">&#128310; HEX &#183; RGB &#183; HSL</span>
+        <span class="wlc-tag">&#128397; Font Detection</span>
+        <span class="wlc-tag">&#128187; CSS Export</span>
+        <span class="wlc-tag">&#128194; History</span>
+        <span class="wlc-tag">&#128242; PWA Install</span>
+    </div>
+    <button class="btn-start" onclick="startApp()">&#128640; Shuru Karo</button>
+</div>
+
+<div id="app">
+    <header>
+        <div class="logo">
+            <div class="logo-icon">&#127912;</div>
+            <div>
+                <div class="logo-nm">Design Analyzer Pro</div>
+                <div class="logo-by">by Ahmed Ali</div>
+            </div>
+        </div>
+        <button id="install-btn" onclick="installPWA()">&#128242; Install App</button>
+    </header>
+
+    <div class="upload-zone" id="uz" onclick="document.getElementById('fi').click()">
+        <div class="up-icon">&#128247;</div>
+        <div class="up-txt"><strong>Image yahan drag karo</strong> ya <span class="up-hl">click karke choose karo</span></div>
+        <div class="up-note">PNG &#183; JPG &#183; WEBP &#183; GIF &#183; BMP &#183; SVG support hai</div>
+        <input type="file" id="fi" accept="image/*" hidden>
+    </div>
+
+    <div id="loader">
+        <div class="ring"></div>
+        <div style="color:var(--tm);font-size:.9rem;">&#10024; Image analyze ho raha hai...</div>
+    </div>
+
+    <div id="results">
+        <div class="rg">
+            <div class="card">
+                <div class="ch">&#128247; Uploaded Image</div>
+                <img id="prev-img" alt="Preview">
+                <div class="img-tags" id="img-tags"></div>
+            </div>
+            <div class="card">
+                <div class="ch">&#127912; Dominant Colors</div>
+                <div class="clist" id="clist"></div>
+                <button class="copy-all" onclick="copyAll()">&#128203; Sare HEX Colors Copy Karo</button>
+            </div>
+            <div class="card fw">
+                <div class="ch">&#128397; Font Detection</div>
+                <div class="fi">
+                    <div>
+                        <p class="fi-txt">Image se font detect karna AI ki zaroorat hoti hai.<br>Niche free tools se <strong style="color:var(--tx)">exact font identify karo</strong> — jo sab designers daily use karte hain:</p>
+                        <div class="fi-note">&#128161; <span><strong>Tip:</strong> Image mein text ka screenshot lo, phir WhatTheFont pe upload karo — 90%+ accurate result milta hai!</span></div>
+                    </div>
+                    <div class="fbts">
+                        <button class="fbt p" onclick="openWTF()"><span>&#128269;</span><span class="fbt-t"><span class="fbt-nm">WhatTheFont</span><span class="fbt-sub">by MyFonts &mdash; Best!</span></span></button>
+                        <a href="https://www.fontsquirrel.com/matcherator" target="_blank" class="fbt s" style="text-decoration:none;"><span>&#128483;</span><span class="fbt-t"><span class="fbt-nm">Font Matcherator</span><span class="fbt-sub">by Font Squirrel</span></span></a>
+                        <a href="https://fonts.google.com/" target="_blank" class="fbt s" style="text-decoration:none;"><span style="font-weight:800">G</span><span class="fbt-t"><span class="fbt-nm">Google Fonts</span><span class="fbt-sub">Free fonts browse karo</span></span></a>
+                    </div>
+                </div>
+            </div>
+            <div class="card fw">
+                <div class="ch">&#128187; CSS Variables Export</div>
+                <div class="css-out" id="css-out">/* Image upload karo phir yahan CSS variables ayenge */</div>
+                <div class="er">
+                    <button class="bsm pu" onclick="copyCss()">&#128203; CSS Copy Karo</button>
+                    <button class="bsm gn" onclick="dlCss()">&#8681; Download .css</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sh">
+        <div class="st">&#128194; History <span class="sc" id="hcnt">0</span></div>
+        <button class="btn-cl" onclick="clearHist()">&#128465; Clear All</button>
+    </div>
+    <div id="hwrap"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const C=[
+    {n:'Black',r:0,g:0,b:0},{n:'White',r:255,g:255,b:255},{n:'Red',r:255,g:0,b:0},
+    {n:'Lime',r:0,g:255,b:0},{n:'Blue',r:0,g:0,b:255},{n:'Yellow',r:255,g:255,b:0},
+    {n:'Cyan',r:0,g:255,b:255},{n:'Magenta',r:255,g:0,b:255},{n:'Silver',r:192,g:192,b:192},
+    {n:'Gray',r:128,g:128,b:128},{n:'Maroon',r:128,g:0,b:0},{n:'Olive',r:128,g:128,b:0},
+    {n:'Green',r:0,g:128,b:0},{n:'Purple',r:128,g:0,b:128},{n:'Teal',r:0,g:128,b:128},
+    {n:'Navy',r:0,g:0,b:128},{n:'Orange',r:255,g:165,b:0},{n:'Pink',r:255,g:192,b:203},
+    {n:'Brown',r:165,g:42,b:42},{n:'Coral',r:255,g:127,b:80},{n:'Crimson',r:220,g:20,b:60},
+    {n:'Dark Blue',r:0,g:0,b:139},{n:'Dark Cyan',r:0,g:139,b:139},{n:'Dark Golden Rod',r:184,g:134,b:11},
+    {n:'Dark Gray',r:169,g:169,b:169},{n:'Dark Green',r:0,g:100,b:0},{n:'Dark Magenta',r:139,g:0,b:139},
+    {n:'Dark Olive Green',r:85,g:107,b:47},{n:'Dark Orange',r:255,g:140,b:0},{n:'Dark Red',r:139,g:0,b:0},
+    {n:'Dark Salmon',r:233,g:150,b:122},{n:'Dark Slate Blue',r:72,g:61,b:139},{n:'Dark Turquoise',r:0,g:206,b:209},
+    {n:'Dark Violet',r:148,g:0,b:211},{n:'Deep Pink',r:255,g:20,b:147},{n:'Deep Sky Blue',r:0,g:191,b:255},
+    {n:'Dim Gray',r:105,g:105,b:105},{n:'Dodger Blue',r:30,g:144,b:255},{n:'Fire Brick',r:178,g:34,b:34},
+    {n:'Forest Green',r:34,g:139,b:34},{n:'Gold',r:255,g:215,b:0},{n:'Goldenrod',r:218,g:165,b:32},
+    {n:'Green Yellow',r:173,g:255,b:47},{n:'Hot Pink',r:255,g:105,b:180},{n:'Indian Red',r:205,g:92,b:92},
+    {n:'Indigo',r:75,g:0,b:130},{n:'Ivory',r:255,g:255,b:240},{n:'Khaki',r:240,g:230,b:140},
+    {n:'Lavender',r:230,g:230,b:250},{n:'Lemon Chiffon',r:255,g:250,b:205},{n:'Light Blue',r:173,g:216,b:230},
+    {n:'Light Coral',r:240,g:128,b:128},{n:'Light Cyan',r:224,g:255,b:255},{n:'Light Gray',r:211,g:211,b:211},
+    {n:'Light Green',r:144,g:238,b:144},{n:'Light Pink',r:255,g:182,b:193},{n:'Light Salmon',r:255,g:160,b:122},
+    {n:'Light Sea Green',r:32,g:178,b:170},{n:'Light Sky Blue',r:135,g:206,b:250},{n:'Light Slate Gray',r:119,g:136,b:153},
+    {n:'Light Steel Blue',r:176,g:196,b:222},{n:'Light Yellow',r:255,g:255,b:224},{n:'Lime Green',r:50,g:205,b:50},
+    {n:'Medium Aquamarine',r:102,g:205,b:170},{n:'Medium Blue',r:0,g:0,b:205},{n:'Medium Orchid',r:186,g:85,b:211},
+    {n:'Medium Purple',r:147,g:112,b:219},{n:'Medium Sea Green',r:60,g:179,b:113},{n:'Medium Slate Blue',r:123,g:104,b:238},
+    {n:'Medium Spring Green',r:0,g:250,b:154},{n:'Medium Turquoise',r:72,g:209,b:204},{n:'Medium Violet Red',r:199,g:21,b:133},
+    {n:'Midnight Blue',r:25,g:25,b:112},{n:'Olive Drab',r:107,g:142,b:35},{n:'Orange Red',r:255,g:69,b:0},
+    {n:'Orchid',r:218,g:112,b:214},{n:'Pale Golden Rod',r:238,g:232,b:170},{n:'Pale Green',r:152,g:251,b:152},
+    {n:'Pale Turquoise',r:175,g:238,b:238},{n:'Pale Violet Red',r:219,g:112,b:147},{n:'Peach Puff',r:255,g:218,b:185},
+    {n:'Peru',r:205,g:133,b:63},{n:'Plum',r:221,g:160,b:221},{n:'Powder Blue',r:176,g:224,b:230},
+    {n:'Rosy Brown',r:188,g:143,b:143},{n:'Royal Blue',r:65,g:105,b:225},{n:'Saddle Brown',r:139,g:69,b:19},
+    {n:'Salmon',r:250,g:128,b:114},{n:'Sandy Brown',r:244,g:164,b:96},{n:'Sea Green',r:46,g:139,b:87},
+    {n:'Sienna',r:160,g:82,b:45},{n:'Sky Blue',r:135,g:206,b:235},{n:'Slate Blue',r:106,g:90,b:205},
+    {n:'Slate Gray',r:112,g:128,b:144},{n:'Spring Green',r:0,g:255,b:127},{n:'Steel Blue',r:70,g:130,b:180},
+    {n:'Tan',r:210,g:180,b:140},{n:'Thistle',r:216,g:191,b:216},{n:'Tomato',r:255,g:99,b:71},
+    {n:'Turquoise',r:64,g:224,b:208},{n:'Violet',r:238,g:130,b:238},{n:'Wheat',r:245,g:222,b:179},
+    {n:'Yellow Green',r:154,g:205,b:50},{n:'Rebecca Purple',r:102,g:51,b:153},{n:'Chocolate',r:210,g:105,b:30},
+    {n:'Beige',r:245,g:245,b:220},{n:'Azure',r:240,g:255,b:255},{n:'Bisque',r:255,g:228,b:196},
+    {n:'Blue Violet',r:138,g:43,b:226},{n:'Cadet Blue',r:95,g:158,b:160},{n:'Chartreuse',r:127,g:255,b:0},
+    {n:'Antique White',r:250,g:235,b:215},{n:'Aquamarine',r:127,g:255,b:212},{n:'Burly Wood',r:222,g:184,b:135},
+    {n:'Cornflower Blue',r:100,g:149,b:237},{n:'Dark Khaki',r:189,g:183,b:107},{n:'Dark Sea Green',r:143,g:188,b:143},
+    {n:'Dark Slate Gray',r:47,g:79,b:79},{n:'Gainsboro',r:220,g:220,b:220},{n:'Ghost White',r:248,g:248,b:255},
+    {n:'Honey Dew',r:240,g:255,b:240},{n:'Lawn Green',r:124,g:252,b:0},{n:'Linen',r:250,g:240,b:230},
+    {n:'Mint Cream',r:245,g:255,b:250},{n:'Misty Rose',r:255,g:228,b:225},{n:'Moccasin',r:255,g:228,b:181},
+    {n:'Navajo White',r:255,g:222,b:173},{n:'Old Lace',r:253,g:245,b:230},{n:'Papaya Whip',r:255,g:239,b:213},
+    {n:'Sea Shell',r:255,g:245,b:238},{n:'Snow',r:255,g:250,b:250},{n:'Corn Silk',r:255,g:248,b:220},
+];
+
+const hex=(r,g,b)=>'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0').toUpperCase()).join('');
+function hsl(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h=0,s=0,l=(mx+mn)/2;if(mx!==mn){const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);if(mx===r)h=((g-b)/d+(g<b?6:0))/6;else if(mx===g)h=((b-r)/d+2)/6;else h=((r-g)/d+4)/6;}return `hsl(${Math.round(h*360)},${Math.round(s*100)}%,${Math.round(l*100)}%)`;}
+function cname(r,g,b){let best='Unknown',d=Infinity;for(const c of C){const x=Math.sqrt((r-c.r)**2+(g-c.g)**2+(b-c.b)**2);if(x<d){d=x;best=c.n;}}return best;}
+const toast=msg=>{const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);};
+
+function startApp(){document.getElementById('welcome').classList.add('hide');localStorage.setItem('dap_v','1');}
+if(localStorage.getItem('dap_v'))document.getElementById('welcome').style.display='none';
+
+let dp=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('install-btn').classList.add('show');});
+window.addEventListener('appinstalled',()=>{document.getElementById('install-btn').classList.remove('show');toast('App install ho gayi!');dp=null;});
+async function installPWA(){if(!dp){toast('Chrome/Edge mein open karo phir install hoga.');return;}await dp.prompt();dp=null;}
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+const uz=document.getElementById('uz');const fi=document.getElementById('fi');
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('over');});
+uz.addEventListener('dragleave',()=>uz.classList.remove('over'));
+uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))proc(f);else toast('Sirf image files upload kar sakte ho!');});
+fi.addEventListener('change',e=>{if(e.target.files[0]){proc(e.target.files[0]);fi.value='';}});
+
+function dist(a,b){return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2);}
+function kMeans(px,k=8,it=10){if(px.length<k)k=px.length;const step=Math.floor(px.length/k);let cents=Array.from({length:k},(_,i)=>[...px[Math.min(i*step,px.length-1)]]);let asgn=new Array(px.length).fill(0);for(let t=0;t<it;t++){for(let i=0;i<px.length;i++){let md=Infinity,mi=0;for(let j=0;j<k;j++){const d=dist(px[i],cents[j]);if(d<md){md=d;mi=j;}}asgn[i]=mi;}const S=Array.from({length:k},()=>[0,0,0]);const N=new Array(k).fill(0);for(let i=0;i<px.length;i++){const c=asgn[i];S[c][0]+=px[i][0];S[c][1]+=px[i][1];S[c][2]+=px[i][2];N[c]++;}for(let j=0;j<k;j++)if(N[j]>0)cents[j]=S[j].map(v=>Math.round(v/N[j]));}const N=new Array(k).fill(0);asgn.forEach(a=>N[a]++);return cents.map((c,i)=>({r:c[0],g:c[1],b:c[2],cnt:N[i],pct:Math.round(N[i]/px.length*100)})).sort((a,b)=>b.cnt-a.cnt);}
+
+let curSrc=null,curCols=[];
+function proc(file){document.getElementById('loader').classList.add('on');document.getElementById('results').classList.remove('on');const rd=new FileReader();rd.onload=e=>{const img=new Image();img.onload=()=>{const MAX=260;let{width:w,height:h}=img;if(w>MAX||h>MAX){if(w>h){h=Math.round(h/w*MAX);w=MAX;}else{w=Math.round(w/h*MAX);h=MAX;}}const cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(img,0,0,w,h);const id=cx.getImageData(0,0,w,h);const px=[];for(let i=0;i<id.data.length;i+=16)if(id.data[i+3]>100)px.push([id.data[i],id.data[i+1],id.data[i+2]]);const cols=kMeans(px,8,10);curSrc=e.target.result;curCols=cols;disp(e.target.result,cols,file);saveH(e.target.result,cols,file.name);document.getElementById('loader').classList.remove('on');document.getElementById('results').classList.add('on');document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});};img.src=e.target.result;};rd.readAsDataURL(file);}
+
+function disp(src,cols,file){
+    document.getElementById('prev-img').src=src;
+    document.getElementById('img-tags').innerHTML=`<span class="itag">&#128196; ${file.name}</span><span class="itag">&#128230; ${(file.size/1024).toFixed(1)} KB</span><span class="itag">&#128247; ${file.type||'image'}</span>`;
+    const list=document.getElementById('clist');list.innerHTML='';
+    cols.forEach(c=>{
+        const h=hex(c.r,c.g,c.b),rgb=`rgb(${c.r},${c.g},${c.b})`,hs=hsl(c.r,c.g,c.b),nm=cname(c.r,c.g,c.b);
+        const el=document.createElement('div');el.className='ci';
+        el.innerHTML=`<div class="sw" style="background:${h};"></div><div class="ci-info"><div class="ci-nm">${nm}</div><div class="ci-codes"><span class="cb" data-v="${h}" onclick="cpb(this)">${h}</span><span class="cb" data-v="${rgb}" onclick="cpb(this)">RGB</span><span class="cb" data-v="${hs}" onclick="cpb(this)">HSL</span></div><div class="pb"><div class="pf" style="width:0%;background:${h};" data-p="${c.pct}"></div></div></div><div class="pl">${c.pct}%</div>`;
+        list.appendChild(el);
+    });
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{document.querySelectorAll('.pf').forEach(e=>e.style.width=e.dataset.p+'%');}));
+    const css=cols.map((c,i)=>`  --color-${i+1}: ${hex(c.r,c.g,c.b)}; /* ${cname(c.r,c.g,c.b).toLowerCase().replace(/\s+/g,'-')} - ${c.pct}% */`).join('\n');
+    document.getElementById('css-out').textContent=`:root {\n${css}\n}`;
+}
+
+function cpb(el){navigator.clipboard.writeText(el.dataset.v).then(()=>{const o=el.textContent;el.textContent='OK';el.classList.add('ok');setTimeout(()=>{el.textContent=o;el.classList.remove('ok');},1400);toast('Copy: '+el.dataset.v);});}
+function copyAll(){navigator.clipboard.writeText(curCols.map(c=>hex(c.r,c.g,c.b)).join(', ')).then(()=>toast('Sare HEX colors copy ho gaye!'));}
+function copyCss(){navigator.clipboard.writeText(document.getElementById('css-out').textContent).then(()=>toast('CSS copy ho gayi!'));}
+function dlCss(){const b=new Blob([document.getElementById('css-out').textContent],{type:'text/css'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='design-colors.css';a.click();toast('design-colors.css download ho rahi hai!');}
+function openWTF(){window.open('https://www.myfonts.com/pages/whatthefont','_blank');toast('WhatTheFont khul raha hai -- wahan image upload karo!');}
+
+function saveH(src,cols,fn){const h=JSON.parse(localStorage.getItem('dap_h')||'[]');h.unshift({id:Date.now(),fn,src,cols:cols.slice(0,5).map(c=>({hex:hex(c.r,c.g,c.b),name:cname(c.r,c.g,c.b),pct:c.pct})),date:new Date().toLocaleString('en-PK',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})});if(h.length>12)h.length=12;localStorage.setItem('dap_h',JSON.stringify(h));renderH();}
+function renderH(){const h=JSON.parse(localStorage.getItem('dap_h')||'[]');document.getElementById('hcnt').textContent=h.length;const w=document.getElementById('hwrap');if(!h.length){w.innerHTML='<div class="he"><div class="he-i">&#128525;</div><p>Abhi koi history nahi.<br>Image upload karo, automatically save hogi!</p></div>';return;}w.innerHTML=`<div class="hg">${h.map(e=>`<div class="hc" onclick="loadH(${e.id})" title="${e.fn}"><img src="${e.src}" class="ht" alt="${e.fn}" loading="lazy"><div class="hb"><div class="hfn">${e.fn}</div><div class="hdt">${e.date}</div><div class="hss">${e.cols.map(c=>`<div class="hs" style="background:${c.hex};" title="${c.name}"></div>`).join('')}</div></div></div>`).join('')}</div>`;}
+function loadH(id){const h=JSON.parse(localStorage.getItem('dap_h')||'[]');const e=h.find(x=>x.id===id);if(!e)return;document.getElementById('prev-img').src=e.src;document.getElementById('img-tags').innerHTML=`<span class="itag">${e.fn}</span><span class="itag">History</span><span class="itag">${e.date}</span>`;const list=document.getElementById('clist');list.innerHTML='';e.cols.forEach(c=>{const el=document.createElement('div');el.className='ci';el.innerHTML=`<div class="sw" style="background:${c.hex};"></div><div class="ci-info"><div class="ci-nm">${c.name}</div><div class="ci-codes"><span class="cb" data-v="${c.hex}" onclick="cpb(this)">${c.hex}</span></div><div class="pb"><div class="pf" style="width:${c.pct}%;background:${c.hex};"></div></div></div><div class="pl">${c.pct}%</div>`;list.appendChild(el);});const css=e.cols.map((c,i)=>`  --color-${i+1}: ${c.hex}; /* ${c.name.toLowerCase().replace(/\s+/g,'-')} */`).join('\n');document.getElementById('css-out').textContent=`:root {\n${css}\n}`;document.getElementById('results').classList.add('on');document.getElementById('results').scrollIntoView({behavior:'smooth'});toast('History se load ho gaya!');}
+function clearHist(){if(!confirm('Sari history delete karna chahte ho?'))return;localStorage.removeItem('dap_h');renderH();toast('History clear ho gayi!');}
+renderH();
+</script>
+</body>
+</html>
