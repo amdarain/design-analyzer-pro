@@ -1,0 +1,19 @@
+﻿{
+  "name": "Design Analyzer Pro",
+  "short_name": "DesignPro",
+  "description": "Image Color & Font Analyzer for Graphic Designers by Ahmed Ali",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#09090f",
+  "theme_color": "#7c3aed",
+  "orientation": "any",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
